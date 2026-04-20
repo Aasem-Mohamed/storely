@@ -17,6 +17,7 @@ export const metadata = {
 };
 
 import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 
 export default function RootLayout({ children }) {
@@ -25,12 +26,20 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
+      <body className="min-h-full flex flex-col bg-base-100 text-base-content">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-grow container mx-auto p-4">
-            {children}
-          </main>
+          <CartProvider>
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            {/* Footer */}
+            <footer className="footer footer-center bg-base-200 text-base-content p-8 mt-auto border-t border-base-300">
+              <aside>
+                <p className="text-sm text-base-content/60">
+                  © {new Date().getFullYear()} Storely — Considered goods for everyday life.
+                </p>
+              </aside>
+            </footer>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
