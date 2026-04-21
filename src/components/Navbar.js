@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
@@ -15,11 +16,25 @@ export default function Navbar() {
   const { user, logout, loading } = useAuth();
   const { cartCount } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/store", label: "Store" },
   ];
+
+  const isActive = (href) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
+  const handleCartClick = (e) => {
+    if (!user) {
+      e.preventDefault();
+      router.push("/login?redirect=/cart");
+    }
+  };
 
   return (
     <nav className="navbar bg-base-100 border-b border-base-200 sticky top-0 z-50 backdrop-blur-md bg-opacity-90 px-4 lg:px-8">
@@ -50,7 +65,11 @@ export default function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="rounded-lg hover:bg-base-200 transition-colors"
+                className={`rounded-lg transition-colors ${
+                  isActive(link.href)
+                    ? "active bg-primary text-primary-content font-semibold"
+                    : "hover:bg-base-200"
+                }`}
               >
                 {link.label}
               </Link>
@@ -58,14 +77,28 @@ export default function Navbar() {
           ))}
           {!loading && user?.role === "admin" && (
             <li>
-              <Link href="/admin" className="rounded-lg hover:bg-base-200 transition-colors">
+              <Link
+                href="/admin"
+                className={`rounded-lg transition-colors ${
+                  isActive("/admin")
+                    ? "active bg-primary text-primary-content font-semibold"
+                    : "hover:bg-base-200"
+                }`}
+              >
                 Admin
               </Link>
             </li>
           )}
           {!loading && user?.role === "seller" && (
             <li>
-              <Link href="/seller" className="rounded-lg hover:bg-base-200 transition-colors">
+              <Link
+                href="/seller"
+                className={`rounded-lg transition-colors ${
+                  isActive("/seller")
+                    ? "active bg-primary text-primary-content font-semibold"
+                    : "hover:bg-base-200"
+                }`}
+              >
                 Seller Portal
               </Link>
             </li>
@@ -76,7 +109,11 @@ export default function Navbar() {
       {/* ── Right: Cart + User ── */}
       <div className="navbar-end gap-2">
         {/* Cart icon with badge */}
-        <Link href="/cart" className="btn btn-ghost btn-circle relative">
+        <Link
+          href="/cart"
+          onClick={handleCartClick}
+          className={`btn btn-ghost btn-circle relative ${isActive("/cart") ? "bg-base-200" : ""}`}
+        >
           <HiOutlineShoppingBag className="w-5 h-5" />
           {cartCount > 0 && (
             <span className="badge badge-sm badge-primary absolute -top-1 -right-1 text-xs min-w-5 h-5 animate-badge-pop">
@@ -150,7 +187,11 @@ export default function Navbar() {
                 <Link
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg py-3"
+                  className={`rounded-lg py-3 ${
+                    isActive(link.href)
+                      ? "active bg-primary text-primary-content font-semibold"
+                      : ""
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -158,14 +199,30 @@ export default function Navbar() {
             ))}
             {!loading && user?.role === "admin" && (
               <li>
-                <Link href="/admin" onClick={() => setMobileOpen(false)} className="rounded-lg py-3">
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-lg py-3 ${
+                    isActive("/admin")
+                      ? "active bg-primary text-primary-content font-semibold"
+                      : ""
+                  }`}
+                >
                   Admin Dashboard
                 </Link>
               </li>
             )}
             {!loading && user?.role === "seller" && (
               <li>
-                <Link href="/seller" onClick={() => setMobileOpen(false)} className="rounded-lg py-3">
+                <Link
+                  href="/seller"
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-lg py-3 ${
+                    isActive("/seller")
+                      ? "active bg-primary text-primary-content font-semibold"
+                      : ""
+                  }`}
+                >
                   Seller Portal
                 </Link>
               </li>

@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { HiOutlineShoppingBag, HiCheck, HiStar } from "react-icons/hi2";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const router = useRouter();
   const [added, setAdded] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -13,6 +17,12 @@ export default function ProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
     if (loading || product.stock === 0) return;
+
+    // If user is not logged in, redirect to login with return URL
+    if (!user) {
+      router.push("/login?redirect=/store");
+      return;
+    }
 
     setLoading(true);
     await addToCart(product, 1);

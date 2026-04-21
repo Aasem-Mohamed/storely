@@ -19,6 +19,7 @@ export const metadata = {
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
+import GlobalLoader from "@/components/GlobalLoader";
 
 export default function RootLayout({ children }) {
   return (
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col bg-base-100 text-base-content">
         <AuthProvider>
           <CartProvider>
+            <GlobalLoader />
             <Navbar />
             <main className="flex-grow">{children}</main>
             {/* Footer */}
