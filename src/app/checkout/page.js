@@ -5,14 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { HiOutlineCheckCircle, HiOutlineCreditCard, HiOutlineBanknotes, HiOutlineShoppingBag } from "react-icons/hi2";
+import { HiOutlineCheckCircle, HiOutlineCreditCard, HiOutlineBanknotes, HiOutlineShoppingBag, HiOutlineExclamationTriangle } from "react-icons/hi2";
 
 export default function CheckoutPage() {
-  const { cart, cartTotal, clearCart } = useCart();
-  const { user, loading: authLoading } = useAuth();
+  const { cart, cartTotal, clearCart, fetchCart } = useCart();
+  const { user, token, loading: authLoading } = useAuth();
   const router = useRouter();
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderData, setOrderData] = useState(null);
   const [placing, setPlacing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [checkoutAllowed, setCheckoutAllowed] = useState(false);
   const [form, setForm] = useState({
@@ -59,13 +61,49 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setPlacing(true);
-    // Simulate order processing
-    await new Promise((r) => setTimeout(r, 1800));
-    await clearCart();
-    // Clear the checkout flag
-    sessionStorage.removeItem("storely_checkout_allowed");
-    setOrderPlaced(true);
-    setPlacing(false);
+    setCheckoutError("");
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          paymentMethod,
+          shippingAddress: {
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            street: form.street,
+            city: form.city,
+            state: form.state,
+            zipCode: form.zipCode,
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Clear the checkout flag
+        sessionStorage.removeItem("storely_checkout_allowed");
+        setOrderData(data.order);
+        setOrderPlaced(true);
+        // Refresh cart state
+        await fetchCart();
+      } else {
+        setCheckoutError(data.message || "Something went wrong");
+        if (data.errors) {
+          setCheckoutError(data.errors.join(". "));
+        }
+      }
+    } catch (err) {
+      setCheckoutError("Network error. Please try again.");
+    } finally {
+      setPlacing(false);
+    }
   };
 
   // Show loader while checking access
@@ -110,7 +148,7 @@ export default function CheckoutPage() {
             Thank you for your purchase. Your order has been confirmed.
           </p>
           <p className="text-sm text-base-content/40 mb-8">
-            Order #{Math.random().toString(36).substring(2, 10).toUpperCase()} • {paymentMethod === "cod" ? "Cash on Delivery" : "Credit Card"}
+            Order #{orderData?.orderId || "..."} • {paymentMethod === "cod" ? "Cash on Delivery" : "Credit Card"}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -149,6 +187,13 @@ export default function CheckoutPage() {
       </section>
 
       <div className="container mx-auto px-4 py-8">
+        {checkoutError && (
+          <div className="alert alert-error mb-6 shadow-sm">
+            <HiOutlineExclamationTriangle className="w-5 h-5" />
+            <span className="text-sm">{checkoutError}</span>
+          </div>
+        )}
+
         <form onSubmit={handlePlaceOrder}>
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left — Forms */}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Product from "@/models/Product";
+import User from "@/models/User"; // Ensure User schema is registered for .populate()
 import { requireRole, verifyToken } from "@/lib/auth";
 
 /**
