@@ -451,7 +451,9 @@ export default function AdminDashboard() {
                           </span>
                         </td>
                         <td>
-                          {product.isActive ? (
+                          {product.stock === 0 ? (
+                            <span className="badge badge-sm badge-warning gap-1">Out of Stock</span>
+                          ) : product.isActive ? (
                             <span className="badge badge-sm badge-success gap-1">Active</span>
                           ) : (
                             <span className="badge badge-sm badge-error gap-1">Inactive</span>

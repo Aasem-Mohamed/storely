@@ -29,6 +29,14 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
+  // Helper: only store non-sensitive fields in localStorage
+  const safeUserForStorage = (u) => ({
+    _id: u._id,
+    name: u.name,
+    email: u.email,
+    role: u.role,
+  });
+
   const login = async (email, password, redirectUrl = null) => {
     try {
       const res = await fetch("/api/auth/login", {
@@ -43,7 +51,7 @@ export function AuthProvider({ children }) {
         setUser(data.user);
         setToken(data.token);
 
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(safeUserForStorage(data.user)));
         localStorage.setItem("token", data.token);
 
         // If a redirect URL is provided, use it
@@ -79,7 +87,7 @@ export function AuthProvider({ children }) {
       if (data.success) {
         setUser(data.user);
         setToken(data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(safeUserForStorage(data.user)));
         localStorage.setItem("token", data.token);
 
         if (redirectUrl) {
