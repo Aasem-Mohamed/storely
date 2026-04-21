@@ -1,26 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { HiOutlineCheckCircle, HiOutlineCreditCard, HiOutlineBanknotes, HiOutlineShoppingBag } from "react-icons/hi2";
 
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [checkoutAllowed, setCheckoutAllowed] = useState(false);
   const [form, setForm] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
+    name: "",
+    email: "",
+    phone: "",
     street: "",
     city: "",
     state: "",
     zipCode: "",
   });
+
+  // Auth + Cart-only access guard
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.push("/login?redirect=/cart");
+        return;
+      }
+
+      // Check if user came from cart page
+      const allowed = sessionStorage.getItem("storely_checkout_allowed");
+      if (!allowed) {
+        router.push("/cart");
+        return;
+      }
+
+      setCheckoutAllowed(true);
+
+      // Pre-fill form with user data
+      setForm((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      }));
+    }
+  }, [user, authLoading, router]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,9 +62,24 @@ export default function CheckoutPage() {
     // Simulate order processing
     await new Promise((r) => setTimeout(r, 1800));
     await clearCart();
+    // Clear the checkout flag
+    sessionStorage.removeItem("storely_checkout_allowed");
     setOrderPlaced(true);
     setPlacing(false);
   };
+
+  // Show loader while checking access
+  if (authLoading || !checkoutAllowed) {
+    if (orderPlaced) {
+      // Allow rendering the success state even after flag is cleared
+    } else {
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      );
+    }
+  }
 
   // Success State
   if (orderPlaced) {

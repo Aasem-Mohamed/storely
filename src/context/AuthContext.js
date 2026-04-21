@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const AuthContext = createContext();
 
@@ -13,17 +13,23 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Load auth state from local storage on initial render
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    try {
+      const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
 
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+      if (storedUser && storedToken) {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+      }
+    } catch (err) {
+      // If localStorage is corrupted, clear it
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, redirectUrl = null) => {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -40,9 +46,16 @@ export function AuthProvider({ children }) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
 
-        if (data.user.role === "admin") router.push("/admin");
-        else if (data.user.role === "seller") router.push("/seller");
-        else router.push("/");
+        // If a redirect URL is provided, use it
+        if (redirectUrl) {
+          router.push(redirectUrl);
+        } else if (data.user.role === "admin") {
+          router.push("/admin");
+        } else if (data.user.role === "seller") {
+          router.push("/seller");
+        } else {
+          router.push("/");
+        }
 
         return { success: true };
       } else {
@@ -53,7 +66,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (name, email, password, phone, role) => {
+  const register = async (name, email, password, phone, role, redirectUrl = null) => {
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -69,8 +82,13 @@ export function AuthProvider({ children }) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
 
-        if (data.user.role === "seller") router.push("/seller");
-        else router.push("/");
+        if (redirectUrl) {
+          router.push(redirectUrl);
+        } else if (data.user.role === "seller") {
+          router.push("/seller");
+        } else {
+          router.push("/");
+        }
 
         return { success: true };
       } else {

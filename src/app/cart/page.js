@@ -1,11 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { HiOutlineTrash, HiOutlinePlus, HiOutlineMinus, HiOutlineShoppingBag, HiOutlineArrowRight } from "react-icons/hi2";
 
 export default function CartPage() {
   const { cart, cartCount, cartTotal, updateQuantity, removeFromCart, clearCart, loading } = useCart();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+
+  // Auth guard — redirect to login if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login?redirect=/cart");
+    }
+  }, [user, authLoading, router]);
+
+  // Show loader while auth is loading or user not verified yet
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -30,6 +51,12 @@ export default function CartPage() {
       </div>
     );
   }
+
+  const handleProceedToCheckout = () => {
+    // Set flag so checkout page knows user came from cart
+    sessionStorage.setItem("storely_checkout_allowed", "true");
+    router.push("/checkout");
+  };
 
   return (
     <div className="animate-rise">
@@ -131,10 +158,10 @@ export default function CartPage() {
                   <span>EGP {cartTotal.toLocaleString()}</span>
                 </div>
 
-                <Link href="/checkout" className="btn btn-primary w-full mt-4 gap-2">
+                <button onClick={handleProceedToCheckout} className="btn btn-primary w-full mt-4 gap-2">
                   Checkout
                   <HiOutlineArrowRight className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
             </div>
           </div>

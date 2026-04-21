@@ -48,15 +48,41 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/products?limit=4&sortBy=createdAt&sortOrder=desc")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
+    let cancelled = false;
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch("/api/products?limit=4&sortBy=createdAt&sortOrder=desc");
+        const data = await res.json();
+        if (!cancelled && data.success) {
           setProducts(data.products);
         }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+        // Retry once after a short delay (handles cold-start compilation)
+        if (!cancelled) {
+          setTimeout(async () => {
+            try {
+              const res = await fetch("/api/products?limit=4&sortBy=createdAt&sortOrder=desc");
+              const data = await res.json();
+              if (!cancelled && data.success) {
+                setProducts(data.products);
+              }
+            } catch (retryErr) {
+              console.error("Retry also failed:", retryErr);
+            }
+          }, 1500);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchProducts();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
