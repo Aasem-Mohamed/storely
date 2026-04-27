@@ -156,7 +156,7 @@ function RegisterForm() {
                 <label className="label pb-1">
                   <span className="label-text font-medium">Full Name</span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.name ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.name ? "input-error" : ""}`}>
                   <HiOutlineUser className="w-4 h-4 text-base-content/40" />
                   <input
                     type="text"
@@ -179,7 +179,7 @@ function RegisterForm() {
                 <label className="label pb-1">
                   <span className="label-text font-medium">Email</span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.email ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.email ? "input-error" : ""}`}>
                   <HiOutlineEnvelope className="w-4 h-4 text-base-content/40" />
                   <input
                     type="email"
@@ -202,7 +202,7 @@ function RegisterForm() {
                 <label className="label pb-1">
                   <span className="label-text font-medium">Password</span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.password ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.password ? "input-error" : ""}`}>
                   <HiOutlineLockClosed className="w-4 h-4 text-base-content/40" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -237,7 +237,7 @@ function RegisterForm() {
                 <label className="label pb-1">
                   <span className="label-text font-medium">Confirm Password</span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.confirmPassword ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.confirmPassword ? "input-error" : ""}`}>
                   <HiOutlineLockClosed className="w-4 h-4 text-base-content/40" />
                   <input
                     type={showPassword ? "text" : "password"}
@@ -262,7 +262,7 @@ function RegisterForm() {
                     Phone <span className="text-base-content/40 font-normal">(optional)</span>
                   </span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.phone ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.phone ? "input-error" : ""}`}>
                   <HiOutlinePhone className="w-4 h-4 text-base-content/40" />
                   <input
                     type="tel"

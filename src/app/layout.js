@@ -19,7 +19,7 @@ export const metadata = {
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
-import Navbar from "@/components/Navbar";
+import AppShell from "@/components/AppShell";
 import GlobalLoader from "@/components/GlobalLoader";
 
 export default function RootLayout({ children }) {
@@ -27,22 +27,14 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-base-100 text-base-content">
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
               <GlobalLoader />
-              <Navbar />
-              <main className="flex-grow">{children}</main>
-              {/* Footer */}
-              <footer className="footer footer-center bg-base-200 text-base-content p-8 mt-auto border-t border-base-300">
-                <aside>
-                  <p className="text-sm text-base-content/60">
-                    © {new Date().getFullYear()} Storely — Considered goods for everyday life.
-                  </p>
-                </aside>
-              </footer>
+              <AppShell>{children}</AppShell>
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

@@ -84,6 +84,13 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
+/* Better badge padding */
+.badge {
+  padding-left: 0.85rem !important;
+  padding-right: 0.85rem !important;
+  height: 1.5rem; /* Ensure consistent height */
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

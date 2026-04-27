@@ -139,7 +139,7 @@ export default function AdminDashboard() {
 
       if (data.success) {
         setProducts(data.products);
-        const active = data.products.filter((p) => p.isActive).length;
+        const active = data.products.filter((p) => p.isActive && p.stock > 0).length;
         const outOfStock = data.products.filter((p) => p.stock === 0).length;
         setStats({
           total: data.pagination?.totalProducts || data.products.length,

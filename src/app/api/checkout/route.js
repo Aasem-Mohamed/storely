@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Cart from "@/models/Cart";
 import Product from "@/models/Product";
+import Order from "@/models/Order";
 import { verifyToken } from "@/lib/auth";
 
 /**
@@ -9,8 +10,9 @@ import { verifyToken } from "@/lib/auth";
  * Process an order:
  *   1. Validate all cart items have sufficient stock
  *   2. Decrement stock for each product
- *   3. Clear the user's cart
- *   4. Return success
+ *   3. Save the order to the database
+ *   4. Clear the user's cart
+ *   5. Return the saved order
  * Requires authentication
  */
 export async function POST(request) {
@@ -25,10 +27,13 @@ export async function POST(request) {
 
     await dbConnect();
 
+    const body = await request.json();
+    const { paymentMethod, shippingAddress } = body;
+
     // Get user's cart
     const cart = await Cart.findOne({ user: authUser.id }).populate({
       path: "items.product",
-      select: "name price stock isActive",
+      select: "name price stock isActive seller",
     });
 
     if (!cart || cart.items.length === 0) {
@@ -85,8 +90,36 @@ export async function POST(request) {
       0
     );
 
-    // Generate order ID
-    const orderId = Math.random().toString(36).substring(2, 10).toUpperCase();
+    // Generate human-readable order ID
+    const orderId = `ORD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+    // Build order items with seller references
+    const orderItems = validItems.map((item) => ({
+      product: item.product._id,
+      seller: item.product.seller,
+      name: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+    }));
+
+    // Save the order to the database
+    const order = await Order.create({
+      user: authUser.id,
+      orderId,
+      items: orderItems,
+      shippingAddress: {
+        name: shippingAddress?.name || "",
+        email: shippingAddress?.email || "",
+        phone: shippingAddress?.phone || "",
+        street: shippingAddress?.street || "",
+        city: shippingAddress?.city || "",
+        state: shippingAddress?.state || "",
+        zipCode: shippingAddress?.zipCode || "",
+      },
+      paymentMethod: paymentMethod || "cod",
+      totalAmount: orderTotal,
+      status: "confirmed",
+    });
 
     // Clear the cart
     cart.items = [];
@@ -97,15 +130,17 @@ export async function POST(request) {
         success: true,
         message: "Order placed successfully",
         order: {
-          orderId,
-          items: validItems.map((item) => ({
-            product: item.product.name,
+          _id: order._id,
+          orderId: order.orderId,
+          items: order.items.map((item) => ({
+            product: item.name,
             quantity: item.quantity,
-            price: item.product.price,
-            subtotal: item.product.price * item.quantity,
+            price: item.price,
+            subtotal: item.price * item.quantity,
           })),
-          total: orderTotal,
-          status: "confirmed",
+          total: order.totalAmount,
+          status: order.status,
+          createdAt: order.createdAt,
         },
       },
       { status: 200 }
