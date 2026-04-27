@@ -9,15 +9,57 @@ import {
   HiOutlineTruck,
   HiOutlineShieldCheck,
   HiOutlineCreditCard,
+  HiOutlineComputerDesktop,
+  HiOutlineShoppingBag,
+  HiOutlineHome,
+  HiOutlineTrophy,
+  HiOutlineBeaker,
+  HiOutlineGift,
 } from "react-icons/hi2";
 
 const CATEGORIES = [
-  { name: "Electronics", slug: "electronics", emoji: "🔌" },
-  { name: "Clothing", slug: "clothing", emoji: "👕" },
-  { name: "Home & Kitchen", slug: "home & kitchen", emoji: "🏠" },
-  { name: "Sports", slug: "sports", emoji: "⚽" },
-  { name: "Food & Beverages", slug: "food & beverages", emoji: "🍵" },
-  { name: "Accessories", slug: "accessories", emoji: "👜" },
+  { 
+    name: "Electronics", 
+    slug: "electronics", 
+    icon: HiOutlineComputerDesktop,
+    bgColor: "bg-blue-500/10",
+    iconColor: "text-blue-600"
+  },
+  { 
+    name: "Clothing", 
+    slug: "clothing", 
+    icon: HiOutlineShoppingBag,
+    bgColor: "bg-indigo-500/10",
+    iconColor: "text-indigo-600"
+  },
+  { 
+    name: "Home & Kitchen", 
+    slug: "home & kitchen", 
+    icon: HiOutlineHome,
+    bgColor: "bg-amber-500/10",
+    iconColor: "text-amber-600"
+  },
+  { 
+    name: "Sports", 
+    slug: "sports", 
+    icon: HiOutlineTrophy,
+    bgColor: "bg-green-500/10",
+    iconColor: "text-green-600"
+  },
+  { 
+    name: "Food & Beverages", 
+    slug: "food & beverages", 
+    icon: HiOutlineBeaker,
+    bgColor: "bg-rose-500/10",
+    iconColor: "text-rose-600"
+  },
+  { 
+    name: "Accessories", 
+    slug: "accessories", 
+    icon: HiOutlineGift,
+    bgColor: "bg-cyan-500/10",
+    iconColor: "text-cyan-600"
+  },
 ];
 
 const FEATURES = [
@@ -25,23 +67,32 @@ const FEATURES = [
     icon: HiOutlineTruck,
     title: "Free Shipping",
     desc: "On orders over EGP 500",
+    color: "text-green-600",
+    bgColor: "bg-green-500/10"
   },
   {
     icon: HiOutlineShieldCheck,
     title: "Secure Payment",
     desc: "Your data is protected",
+    color: "text-blue-600",
+    bgColor: "bg-blue-500/10"
   },
   {
     icon: HiOutlineCreditCard,
     title: "Flexible Payment",
     desc: "Card or Cash on Delivery",
+    color: "text-amber-600",
+    bgColor: "bg-amber-500/10"
   },
   {
     icon: HiOutlineSparkles,
     title: "Quality Guarantee",
     desc: "Curated with care",
+    color: "text-purple-600",
+    bgColor: "bg-purple-500/10"
   },
 ];
+
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -141,7 +192,9 @@ export default function Home() {
                 key={feature.title}
                 className="flex items-center gap-3 py-6 px-4 lg:px-6"
               >
-                <feature.icon className="w-6 h-6 text-primary shrink-0" />
+                <div className={`w-10 h-10 rounded-full ${feature.bgColor} flex items-center justify-center shrink-0`}>
+                  <feature.icon className={`w-5 h-5 ${feature.color}`} />
+                </div>
                 <div>
                   <p className="text-sm font-semibold">{feature.title}</p>
                   <p className="text-xs text-base-content/50">{feature.desc}</p>
@@ -237,9 +290,9 @@ export default function Home() {
                 href={`/store?category=${encodeURIComponent(cat.slug)}`}
                 className="group bg-base-100 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-base-200"
               >
-                <span className="text-4xl mb-3 block group-hover:scale-110 transition-transform duration-300">
-                  {cat.emoji}
-                </span>
+                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${cat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                  <cat.icon className={`w-6 h-6 ${cat.iconColor}`} />
+                </div>
                 <span className="text-sm font-semibold">{cat.name}</span>
               </Link>
             ))}

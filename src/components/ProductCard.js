@@ -62,8 +62,8 @@ export default function ProductCard({ product }) {
   const wishlisted = isInWishlist(product._id);
 
   return (
-    <Link href={`/product/${product._id}`} className="block">
-      <div className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+    <Link href={`/product/${product._id}`} className="block h-full">
+      <div className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col">
         {/* Image */}
         <figure className="relative overflow-hidden bg-base-200/50 aspect-square">
           <img
@@ -110,7 +110,7 @@ export default function ProductCard({ product }) {
         </figure>
 
         {/* Content */}
-        <div className="card-body p-4 gap-2">
+        <div className="card-body p-4 gap-2 flex-1">
           {/* Rating */}
           <div className="flex items-center gap-1">
             <div className="flex items-center">

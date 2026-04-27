@@ -185,6 +185,11 @@ export default function Navbar() {
                       </Link>
                     </li>
                     <li>
+                      <Link href="/orders" className="text-sm">
+                        My Orders
+                      </Link>
+                    </li>
+                    <li>
                       <button
                         onClick={logout}
                         className="text-sm text-error hover:bg-error/10"

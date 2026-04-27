@@ -113,7 +113,7 @@ function LoginForm() {
                 <label className="label">
                   <span className="label-text font-medium">Email</span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.email ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.email ? "input-error" : ""}`}>
                   <HiOutlineEnvelope className="w-4 h-4 text-base-content/40" />
                   <input
                     type="email"
@@ -138,7 +138,7 @@ function LoginForm() {
                 <label className="label">
                   <span className="label-text font-medium">Password</span>
                 </label>
-                <label className={`input input-bordered flex items-center gap-2 ${errors.password ? "input-error" : ""}`}>
+                <label className={`input input-bordered w-full flex items-center gap-2 ${errors.password ? "input-error" : ""}`}>
                   <HiOutlineLockClosed className="w-4 h-4 text-base-content/40" />
                   <input
                     type={showPassword ? "text" : "password"}
